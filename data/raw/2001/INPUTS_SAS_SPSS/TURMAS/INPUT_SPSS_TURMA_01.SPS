@@ -1,0 +1,48 @@
+*************************************************
+ QUESTIONÁRIO 2001  -  TURMAS
+        ANO - 2001
+************************************************
+Selecionar e execultar o programa abaixo.
+
+GET DATA  /TYPE = TXT
+/FILE = 'D:\DADOS\TURMAS\TURMA_01.TXT'
+ /FIXCASE = 1
+ /ARRANGEMENT = FIXED
+ /FIRSTCASE = 1
+ /IMPORTCASE = ALL  
+ /VARIABLES =
+ /1 
+MASCARA	       0-7		F8
+ANO_MASCARA    8-15		F8
+ANO		   16-23		F8
+SERIE		   24-25		A2
+TURMA		   26-33		F8
+ESTRATO	   34-41		F8
+UPA		   42-53		F12
+PESO_TC	   54-61		COMMA8.5
+DEP_ADM	   62-69		F8
+LOCAL		   70-77		F8
+REDE		   78-85		F8
+CAP_INT	   86-93		F8
+UF		  94-101		A8
+REGIAO	102-109		A8
+HOR_INI	110-113		A4
+HOR_FIM	114-117		A4
+N_CHAM	118-120		A3
+N_PRES	121-123		A3
+T001_1		124-131		F8
+T001_2		132-139		F8
+T002_1		140-147		F8
+T002_2		148-155		F8
+T003		156-163		F8
+T004		164-171		F8
+T005		172-179		F8
+T006		180-187		F8
+T007		188-195		F8
+T008		196-203		F8
+.
+CACHE.
+Formats PESO_TC(F8.5).
+EXECUTE.
+
+

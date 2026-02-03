@@ -1,0 +1,64 @@
+********************************************************************************************************************************************************
+ QUESTIONÁRIO 1995  -  ALUNO DA 8ª SÉRIE DO ENSINO FUNDAMENTAL                                                                                                                                         ANO - 2001
+********************************************************************************************************************************************************
+Selecionar e executar o programa abaixo.
+
+GET DATA  /TYPE = TXT
+/FILE = 'D:\DADOS\ALUNOS\PORTUGUES_08SERIE.TXT'
+/FIXCASE = 1
+/ARRANGEMENT = FIXED
+/FIRSTCASE = 1
+/IMPORTCASE = ALL
+/VARIABLES =
+/1 
+ANO		0-7	F8
+SERIE		8-9	A2
+DISC		10-10	A1
+TURMA		11-18	F8
+ALUNO		19-26	F8
+IDADE		27-34	F8
+ESTRATO	35-42	F8
+UPA		43-50	F8
+DEP_ADM	51-58	F8
+LOCAL	59-66	F8
+REDE		67-74	F8
+UF		75-82	F8
+REGIAO	83-90	F8
+PESO_AC	91-98	COMMA8.4
+CADERNO	99-106	F8
+BLOCO1	107-114	F8
+BLOCO2	115-122	F8
+BLOCO3	123-130	F8
+RESP_BL1	131-143	A13
+RESP_BL2	144-156	A13
+RESP_BL3	157-169	A13
+GAB_BL1	170-182	A13
+GAB_BL2	183-195	A13
+GAB_BL3	196-208	A13
+PROFIC	209-220	COMMA12.5
+A081_001	221-226	A6
+A081_002	227-234	F8
+A081_003	235-242	F8
+A081_004	243-250	F8
+A081_005	251-258	F8
+A081_006	259-266	F8
+A081_007	267-274	F8
+A081_008	275-282	F8
+A081_009	283-290	F8
+A081_010	291-298	F8
+A081_011	299-306	F8
+A081_012	307-314	F8
+A081_013	315-322	F8
+A081_014	323-330	F8
+A081_015	331-338	F8
+A082_001	339-346	F8
+A082_002	347-354	F8
+A082_003	355-362	F8
+A082_004	363-370	F8
+A082_005	371-378	F8
+A082_006	379-386	F8
+A082_007	387-394	F8.
+CACHE.
+Formats PESO_AC (F8.4).
+Formats PROFIC (F12.5).
+EXECUTE.
