@@ -252,11 +252,14 @@ subs_opiniao_aprendizagem = {
 }
 df["opiniao_aprendizagem"] = df["opiniao_aprendizagem"].astype("Int64").map(subs_opiniao_aprendizagem)
 
-subs_participacao_pais ={
+subs_participacao_pais = {
     1: 0.9,
     2: 0.8,
-    3: 
+    3: 0.5,
+    4: 0.4,
+    5: 0.1
 }
+df["participacao_pais"] = df["participacao_pais"].astype("Int64").map(subs_participacao_pais)
 
 # índices das colunas que têm indicadores de frequências
 col_indices_frequencia = [
@@ -309,6 +312,17 @@ for idx in col_indices:
     col = df.columns[idx]
     df[col] = df[col].astype("Int64").map({1: "Sim", 2: "Não"})
 
+perfil = (
+    df.groupby(["rede", "escolaridade"])
+      .size()
+      .unstack(fill_value=0)
+)
+
+acesso_direcao = (
+    df.groupby(["rede", "forma_ingresso_direcao"])
+      .size()
+      .unstack(fill_value=0)
+)
 
 #print(df.info())
-print(df.head(3))
+#print(df.head(3))
