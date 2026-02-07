@@ -1,7 +1,8 @@
 import pandas as pd
 
-def read_diretor(df):
+def read_diretor(ano: int) -> pd.DataFrame:
     pd.set_option("display.max_columns", None)
+
     # colunas + posições (extraídas do dicionário)
     colspecs = [
         (0, 8),  # ANO - Ano da aplicação
@@ -129,9 +130,13 @@ def read_diretor(df):
     ]
 
 
-    df = pd.read_fwf(
-        "data/raw/1995/DADOS/DIRETOR/DIRETOR_95.TXT",
+    path = f"data/raw/{ano}/DADOS/DIRETOR/DIRETOR_{str(ano)[-2:]}.TXT"
+
+    df_diretor = pd.read_fwf(
+        path,
         colspecs=colspecs,
         names=names,
         na_values=["", " "],
     )
+
+    return df_diretor
