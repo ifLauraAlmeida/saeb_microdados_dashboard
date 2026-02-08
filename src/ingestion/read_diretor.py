@@ -130,7 +130,7 @@ def read_diretor(ano: int) -> pd.DataFrame:
     ]
 
 
-    path = f"data/raw/{ano}/DADOS/DIRETOR/DIRETOR_{str(ano)[-2:]}.TXT"
+    path = r"C:\Users\Laura\Desktop\saeb_microdados_dashboard\data\raw\{ano}\DADOS\DIRETOR\DIRETOR_{str(ano)[-2:]}.TXT"
 
     df_diretor = pd.read_fwf(
         path,
