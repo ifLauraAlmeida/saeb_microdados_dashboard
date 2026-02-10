@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def read_diretor(ano: int) -> pd.DataFrame:
     pd.set_option("display.max_columns", None)
 
@@ -66,7 +67,6 @@ def read_diretor(ano: int) -> pd.DataFrame:
         (464, 472),  # D_029 - Participação dos pais nas reuniões
     ]
 
-
     names = [
         "ano",
         "serie",
@@ -129,8 +129,7 @@ def read_diretor(ano: int) -> pd.DataFrame:
         "participacao_pais",
     ]
 
-
-    path = r"C:\Users\Laura\Desktop\saeb_microdados_dashboard\data\raw\{ano}\DADOS\DIRETOR\DIRETOR_{str(ano)[-2:]}.TXT"
+    path = f"C:/Users/Laura/Desktop/saeb_microdados_dashboard/data/raw/{ano}/DADOS/DIRETOR/DIRETOR_{str(ano)[-2:]}.TXT"
 
     df_diretor = pd.read_fwf(
         path,
