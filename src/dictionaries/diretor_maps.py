@@ -203,6 +203,28 @@ def map_avaliacoes(df_diretor: pd.DataFrame) -> pd.DataFrame:
         )
     )
 
+    nomes_quantas_vezes = {
+        "reunioes_pedagogicas",
+        "reunioes_administrativas",
+        "frequencia_conselho_escola",
+    }
+
+    for col in nomes_quantas_vezes:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype("Int64")
+                .map(
+                    {
+                        1: "Pelo menos uma vez por mês.",
+                        2: "Pelo menos uma vez por bimestre.",
+                        3: "Pelo menos uma vez por semestre",
+                        4: "Apenas uma vez.",
+                        5: "Nenhuma vez.",
+                    }
+                )
+            )
+
     df["participacao_pais"] = (
         df["participacao_pais"]
         .astype("Int64")
@@ -217,10 +239,65 @@ def map_avaliacoes(df_diretor: pd.DataFrame) -> pd.DataFrame:
         )
     )
 
-    indices_sim_nao = [14]
-    colunas = df.columns[indices_sim_nao]
+    df["projeto_pedagogico"] = (
+        df["projeto_pedagogico"]
+        .astype("Int64")
+        .map(
+            {
+                1: "Sim, o projeto que a Secretária de Educação ou o Conselho Estadual de Educação ou sugeriu.",
+                2: "Sim, elaborado pela própria escola.",
+            }
+        )
+    )
 
-    for col in colunas:
-        df[col] = df[col].map({1: "sim", 2: "não"})
-    
+    nomes_sim_nao = [
+        "participou_cursos",
+        "ingresso_concurso",
+        "meta_conteudos",
+        "meta_melhoria_aprendizagem",
+        "meta_reducao_evasao",
+        "meta_reducao_reprovacao",
+        "meta_cumprimento_atividades",
+        "conselho_escola",
+        "conselho_classe",
+        "recurso_mec_fnde",
+        "recurso_secretaria",
+        "recurso_comunidade",
+        "recurso_apm",
+        "recurso_mensalidades",
+        "sem_captacao_recursos",
+        "problema_falta_professores",
+        "problema_falta_tecnicos",
+        "problema_interrupcao_aulas",
+        "problema_rotatividade_professores",
+        "problema_falta_recursos",
+        "gestao_organizacao_admin",
+        "gestao_acompanhamento_pedagogico",
+        "gestao_avaliacao_alunos",
+        "gestao_participacao_equipe",
+        "gestao_participacao_comunidade",
+        "gestao_controle_trabalho",
+        "gestao_formacao_professores",
+        "reunioes_pais",
+    ]
+
+    for col in nomes_sim_nao:
+        if col in df.columns:
+            df[col] = df[col].astype("Int64").map({1: "sim", 2: "não"})
+
+    nomes_repasse = {"relacao_sistema_educacional", "avaliacao_repasse_recursos"}
+
+    for col in nomes_repasse:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype("Int64")
+                .map(
+                    {
+                        1: "Facilitou administração escolar e montante suficiente",
+                        2: "Facilitou administração escolar e montante insuficiente",
+                    }
+                )
+            )
+
     return df
