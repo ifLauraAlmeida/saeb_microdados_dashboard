@@ -54,6 +54,29 @@ def read_docente(ano: int) -> pd.DataFrame:
         (362, 370), # participou_plano_trabalho
         (370, 378), # conselho_classe
         (378, 386), # reunioes_gestao
+        (386, 394), # p035_1_analisa_dificuldades
+        (394, 402), # p035_2_discute_conteudo
+        (402, 410), # p035_3_decide_aprovacao
+        (410, 418), # p035_4_planos_conjuntos
+        (418, 426), # p035_5_busca_solucoes
+        (426, 434), # p035_6_nao_reuniu
+        (434, 442), # p036_acompanhamento_pedagogico
+        (442, 450), # p037_1_exigir_pais
+        (450, 458), # p037_2_recuperacao_paralela
+        (458, 466), # p037_3_selecionar_alunos
+        (466, 474), # p037_4_capacitacao_professores
+        (474, 482), # p037_5_condicoes_fisicas
+        (482, 490), # p038_1_livros
+        (490, 498), # p038_2_dicionarios
+        (498, 506), # p038_3_quadro_giz
+        (506, 514), # p038_4_papel_oficio
+        (514, 522), # p038_5_reprografia
+        (522, 530), # p038_6_fitas_video
+        (530, 538), # p039_tv_escola
+        (538, 546), # p040_avaliacao_tv
+        (546, 554), # p041_tipo_programa_tv
+        (554, 562), # p042_tempo_programacao_tv
+
     ]
 
     names = [
@@ -107,6 +130,29 @@ def read_docente(ano: int) -> pd.DataFrame:
         "participou_plano_trabalho",
         "conselho_classe",
         "reunioes_gestao",
+        "reuniao_analisa_dificuldades",
+        "reuniao_discute_conteudo",
+        "reuniao_decide_aprovacao",
+        "reuniao_planos_conjuntos",
+        "reuniao_busca_solucoes",
+        "reuniao_nao_ocorreu",
+        "apoio_pedagogico_escola",
+        "exigir_acompanhamento_pais",
+        "programa_recuperacao_paralela",
+        "selecionar_alunos_preparados",
+        "capacitar_professores",
+        "melhorar_condicoes_fisicas",
+        "recurso_livros",
+        "recurso_dicionarios",
+        "recurso_quadro_giz",
+        "recurso_papel_oficio",
+        "recurso_reprografia",
+        "recurso_fitas_video",
+        "assistiu_tv_escola",
+        "avaliacao_tv_escola",
+        "tipo_programa_tv_escola",
+        "tempo_programacao_tv_escola",
+
     ]
 
     path = (
