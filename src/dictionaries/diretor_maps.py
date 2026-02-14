@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def map_categorias_basicas(df_diretor: pd.DataFrame) -> pd.DataFrame:
+def map_categorias_basicas_diretor(df_diretor: pd.DataFrame) -> pd.DataFrame:
     df = df_diretor.copy()
 
     df["serie"] = (
@@ -47,17 +47,6 @@ def map_categorias_basicas(df_diretor: pd.DataFrame) -> pd.DataFrame:
             {
                 1: "Pública",
                 2: "Particular",
-            }
-        )
-    )
-
-    df["sexo"] = (
-        df["sexo"]
-        .astype("Int64")
-        .map(
-            {
-                1: "Feminino",
-                2: "Masculino",
             }
         )
     )
