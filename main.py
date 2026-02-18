@@ -1,81 +1,136 @@
+import streamlit as st
 import pandas as pd
 import plotly.express as px
-import streamlit as st
 
-from ingestion.read_alunos95 import read_alunos
-from dictionaries.alunos_maps import (
+# Imports das suas funções de ingestão e mapas
+from src.ingestion.read_alunos95 import read_alunos95
+from src.ingestion.read_alunos97 import read_alunos97
+from src.dictionaries.alunos_maps import (
     map_categorias_basicas_alunos,
     map_geografia_alunos,
     map_questionario_socioeconomico,
     map_opiniao_matematica,
-)
-from cleaning.alunos_cleaning95 import (
-    clean_alunos_data,
-    drop_missing_essential,
-    clean_zero_to_nan,
+    map_data_nascimento_visual
 )
 
-# --- 1. CARREGAMENTO E LIMPEZA (DE PREFERÊNCIA COM CACHE) ---
+# Configuração da Página
+st.set_page_config(page_title="SAEB 95-97 (Análise Evolutiva)", layout="wide")
+
 @st.cache_data
-def load_and_clean_data():
-    df = read_alunos(1995)
-    df = map_categorias_basicas_alunos(df)
-    df = map_geografia_alunos(df)
-    df = map_questionario_socioeconomico(df)
-    df = map_opiniao_matematica(df)
-    df = clean_alunos_data(df)
-    df = drop_missing_essential(df)
-    df = clean_zero_to_nan(df)
-    # Garante que proficiência seja numérica para não dar erro no gráfico
-    df["proficiencia"] = pd.to_numeric(df["proficiencia"], errors='coerce')
-    return df
+def load_raw_data():
+    # --- Processamento 1995 ---
+    df95 = read_alunos95(1995)
+    df95 = map_categorias_basicas_alunos(df95)
+    df95 = map_geografia_alunos(df95)
+    df95 = map_questionario_socioeconomico(df95)
+    df95 = map_opiniao_matematica(df95)
+    df95["ano_saeb"] = "1995"
+    
+    # --- Processamento 1997 ---
+    df97 = read_alunos97(1997)
+    df97 = map_categorias_basicas_alunos(df97)
+    df97 = map_geografia_alunos(df97)
+    df97 = map_questionario_socioeconomico(df97)
+    df97 = map_opiniao_matematica(df97)
+    df97["ano_saeb"] = "1997"
 
-df_alunos = load_and_clean_data()
+    # Definir colunas de interesse
+    cols_analise = ["ano_saeb", "uf", "dep_adm", "proficiencia", "sexo", "raca"]
+    
+    for col in cols_analise:
+        if col not in df95.columns: df95[col] = None
+        if col not in df97.columns: df97[col] = None
 
-# --- 2. FILTROS NA SIDEBAR OU TOPO ---
-st.title("📊 Dashboard SAEB 1995")
+    df_combined = pd.concat([df95[cols_analise], df97[cols_analise]], ignore_index=True)
+    df_combined["proficiencia"] = pd.to_numeric(df_combined["proficiencia"], errors='coerce')
+    
+    return df_combined
 
-ufs = st.multiselect(
-    "Selecione os Estados para filtrar o gráfico:", 
-    options=sorted(df_alunos['uf'].unique()),
-    help="Se deixar vazio, mostrará todos os estados."
-)
+# Carregar dados
+with st.spinner("A processar dados brutos..."):
+    df_total = load_raw_data()
 
-# Lógica de filtragem
-if ufs:
-    df_filtrado = df_alunos[df_alunos['uf'].isin(ufs)]
-else:
-    df_filtrado = df_alunos
+# --- INTERFACE ---
+st.title("📊 Análise SAEB 95-97")
 
-# --- 3. PROCESSAMENTO PARA O GRÁFICO (USANDO O DF FILTRADO) ---
+# Filtro Lateral
+st.sidebar.header("Filtros")
+ufs = st.sidebar.multiselect("Selecione UFs:", sorted(df_total['uf'].unique().tolist()))
+df_f = df_total[df_total['uf'].isin(ufs)] if ufs else df_total
 
-# Calculamos a média usando o df_filtrado que muda conforme o multiselect
-df_comparativo = df_filtrado.groupby("dep_adm")["proficiencia"].mean().reset_index()
+# --- 1. GRÁFICO E TAXAS (RECUPERANDO A COMPLEXIDADE) ---
+st.divider()
+st.subheader("🚀 Evolução da Proficiência Média e Taxas")
 
-# Ordenar para o gráfico ficar mais intuitivo
-df_comparativo = df_comparativo.sort_values("proficiencia", ascending=False)
+# Agrupamento para o gráfico e métricas
+df_evol = df_f.groupby(["ano_saeb", "dep_adm"])["proficiencia"].mean().reset_index()
 
-# --- 4. CRIAÇÃO DO GRÁFICO ---
+# Criamos o layout de colunas: Gráfico maior (3) e Métricas (1)
+col_graf, col_metrica = st.columns([3, 1])
 
-if not df_comparativo.empty:
-    fig = px.bar(
-        df_comparativo, 
+with col_graf:
+    fig_evol = px.bar(
+        df_evol, 
         x="dep_adm", 
-        y="proficiencia",
-        title="Média de Proficiência por Dependência Administrativa",
-        labels={"dep_adm": "Dependência Adm.", "proficiencia": "Proficiência Média"},
-        color="proficiencia", 
-        color_continuous_scale="Viridis",
-        text_auto='.1f' 
+        y="proficiencia", 
+        color="ano_saeb", 
+        barmode="group", 
+        text_auto='.1f',
+        color_discrete_map={"1995": "#87CEEB", "1997": "#0066CC"},
+        labels={"dep_adm": "Rede de Ensino", "proficiencia": "Média", "ano_saeb": "Ano"}
     )
+    st.plotly_chart(fig_evol, use_container_width=True)
 
-    fig.update_layout(xaxis_title="Rede de Ensino", yaxis_title="Proficiência (Média)")
+with col_metrica:
+    st.markdown("### 📈 Variação (95-97)")
+    
+    # Lógica para calcular o delta entre 95 e 97
+    pivot = df_evol.pivot(index="dep_adm", columns="ano_saeb", values="proficiencia")
+    
+    if "1995" in pivot.columns and "1997" in pivot.columns:
+        for rede in pivot.index:
+            v95 = pivot.loc[rede, "1995"]
+            v97 = pivot.loc[rede, "1997"]
+            
+            if pd.notnull(v95) and pd.notnull(v97):
+                diff = v97 - v95
+                perc = (diff / v95) * 100
+                st.metric(
+                    label=rede, 
+                    value=f"{v97:.1f}", 
+                    delta=f"{diff:.1f} ({perc:.1f}%)"
+                )
+    else:
+        st.info("Selecione dados que contenham ambos os anos para ver as taxas.")
 
-    # Exibindo no Streamlit
-    st.plotly_chart(fig, use_container_width=True)
-else:
-    st.warning("Nenhum dado disponível para os filtros selecionados.")
+# --- 2. PERFIL SOCIODEMOGRÁFICO ---
+st.divider()
+st.subheader("👥 Perfil Sociodemográfico")
 
-# --- 5. (OPCIONAL) EXIBIR TABELA DOS DADOS FILTRADOS ---
-with st.expander("Visualizar dados brutos filtrados"):
-    st.dataframe(df_filtrado.head(100))
+col_sel, col_viz = st.columns([1, 2])
+with col_sel:
+    opcoes = [c for c in ["sexo", "raca"] if df_f[c].notnull().any()]
+    if opcoes:
+        var = st.selectbox("Variável de Perfil:", opcoes)
+        tab = pd.crosstab(df_f['ano_saeb'], df_f[var], normalize='index') * 100
+        st.write(f"Distribuição de {var} (%)")
+        st.dataframe(tab.style.format("{:.1f}%"), use_container_width=True)
+    else:
+        st.warning("Dados de Sexo/Raça estão totalmente nulos.")
+
+with col_viz:
+    if opcoes:
+        fig_perfil = px.histogram(
+            df_f, 
+            x="dep_adm", 
+            color=var, 
+            facet_col="ano_saeb", 
+            barmode="group",
+            labels={"dep_adm": "Rede", "count": "Quantidade"}
+        )
+        st.plotly_chart(fig_perfil, use_container_width=True)
+
+# --- 3. INSPEÇÃO DE DADOS ---
+with st.expander("🔍 Verificação de Colunas Brutas"):
+    st.write("Colunas presentes:", df_total.columns.tolist())
+    st.dataframe(df_total.head(50))
