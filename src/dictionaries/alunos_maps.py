@@ -3,16 +3,13 @@ import pandas as pd
 
 def _safe_map(df: pd.DataFrame, col: str, mapping: dict) -> pd.Series:
     """
-    Converte coluna para numérico de forma segura e aplica mapeamento.
-    Não quebra se houver string, NaN ou valores inválidos.
+    Retorna uma Série mapeada se a coluna existir, 
+    caso contrário retorna uma Série de valores nulos (NaN).
     """
-    if col not in df.columns:
-        return df
-
-    return (
-        pd.to_numeric(df[col], errors="coerce")
-        .map(mapping)
-    )
+    if col in df.columns:
+        return pd.to_numeric(df[col], errors="coerce").map(mapping)
+    # Retorna vazio se não achar a coluna, evitando o erro de DataFrame vs Column
+    return pd.Series([None] * len(df), index=df.index, dtype="object")
 
 
 def map_categorias_basicas_alunos(df_alunos: pd.DataFrame) -> pd.DataFrame:
@@ -72,45 +69,30 @@ def map_geografia_alunos(df_alunos: pd.DataFrame) -> pd.DataFrame:
 def map_questionario_socioeconomico(df_alunos: pd.DataFrame) -> pd.DataFrame:
     df = df_alunos.copy()
 
-    df["sexo"] = _safe_map(df, "sexo", {
-        1: "Masculino", 
-        2: "Feminino"
-    })
+    # --- SEXO ---
+    # Em 95 e 97 já chama 'sexo' no seu read_alunos, mas vamos garantir
+    df["sexo"] = _safe_map(df, "sexo", {1: "Masculino", 2: "Feminino"})
 
+    # --- RAÇA ---
+    # Em 95 e 97 chama 'raca'
     df["raca"] = _safe_map(df, "raca", {
-        1: "Branco(a)", 
-        2: "Pardo(a)", 
-        3: "Preto(a)", 
-        4: "Amarelo(a)", 
-        5: "Indígena"
+        1: "Branco(a)", 2: "Pardo(a)", 3: "Preto(a)", 4: "Amarelo(a)", 5: "Indígena"
     })
 
-    map_instrucao = {
-        1: "Nunca frequentou", 
-        2: "Primário (1ª-4ª)", 
-        3: "Ginásio (5ª-8ª)",
-        4: "Colegial (2º Grau)", 
-        5: "Superior"
-    }
+    # --- TRABALHO (Onde dava o erro) ---
+    # Tentamos os dois nomes possíveis
+    col_trab = "trabalha" if "trabalha" in df.columns else "pai_trabalha"
+    df["trabalha_final"] = _safe_map(df, col_trab, {
+        1: "Não", 2: "Sim", 3: "Sim", 4: "Sim", 5: "Sim"
+    })
 
+    # --- INSTRUÇÃO PAI/MÃE ---
+    map_instrucao = {
+        1: "Analfabeto", 2: "1ª a 4ª Série", 3: "5ª a 8ª Série",
+        4: "Ensino Médio", 5: "Ensino Superior", 6: "Não sabe"
+    }
     df["instrucao_pai"] = _safe_map(df, "instrucao_pai", map_instrucao)
     df["instrucao_mae"] = _safe_map(df, "instrucao_mae", map_instrucao)
-
-    df["trabalha"] = _safe_map(df, "trabalha", {
-        1: "Não", 
-        2: "Sim (8h/dia)", 
-        3: "Sim (4-6h/dia)", 
-        4: "Sim (< 4h/dia)", 
-        5: "Sim (Finais de semana)"
-    })
-
-    df["faltas"] = _safe_map(df, "faltas", {
-        1: "Nenhuma", 
-        2: "5 dias", 
-        3: "15 dias", 
-        4: "30 dias", 
-        5: "> 30 dias"
-    })
 
     return df
 
